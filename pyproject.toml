@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bzr-step-count"
+version = "0.1.0"
+description = "Count raw unified-diff step changes between Bazaar revisions."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Codex" }]
+
+[project.scripts]
+bzr-step-count = "bzr_step_count.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
