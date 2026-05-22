@@ -9,9 +9,11 @@ description = "Count raw unified-diff step changes between Bazaar revisions."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Codex" }]
+dependencies = ["openpyxl>=3.1"]
 
 [project.scripts]
 bzr-step-count = "bzr_step_count.cli:main"
+review-stats = "bzr_step_count.review_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

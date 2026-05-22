@@ -1,0 +1,8 @@
+services:
+  review-stats:
+    build: .
+    image: review-stats:local
+    volumes:
+      - ${REVIEW_CASE_ROOT:-./samples}:/cases:ro
+      - ${REVIEW_OUTPUT_ROOT:-./outputs}:/outputs
+    command: ["scan", "--root", "/cases", "--output", "/outputs", "--skip-bazaar"]
