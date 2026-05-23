@@ -7,6 +7,7 @@ from typing import Any
 
 
 PHASE_ORDER = ["外部仕様書", "内部仕様書", "コード", "テスト仕様書"]
+PHASE_SEQUENCE = ["外部仕様書", "内部仕様書", "コード", "テスト仕様書", "後工程", "リリース後"]
 ESCAPE_PHASE = "後工程/流出"
 DOCUMENT_PHASES = ["外部仕様書", "内部仕様書", "テスト仕様書"]
 PHASE_SHEET_ALIASES = {
@@ -48,6 +49,7 @@ class CaseMetadata:
     redmine_issue_id: str = ""
     redmine_url: str = ""
     owner: str = ""
+    reviewer: str = ""
     review_start: str = ""
     review_end: str = ""
     phase_pages: dict[str, float] = field(default_factory=dict)
@@ -76,6 +78,8 @@ class FindingRecord:
     metric_target: bool
     detection_phase: str
     origin_phase: str
+    work_owner: str = ""
+    reviewer: str = ""
 
     @property
     def is_minor(self) -> bool:
@@ -143,6 +147,9 @@ class PhaseMetric:
     defect_findings: int
     cumulative_defects: int
     escaped_defects: int
+    eligible_defects: int
+    removed_eligible_defects: int
+    escaped_from_phase_defects: int
     denominator_name: str
     denominator_value: float
     finding_density: float | None
@@ -156,10 +163,26 @@ class PhaseMetric:
 
 
 @dataclass
+class CrossSummary:
+    axis: str
+    key: str
+    total_findings: int
+    metric_findings: int
+    minor_findings: int
+    defect_findings: int
+    escaped_defects: int
+    open_findings: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class ReviewDataset:
     cases: list[ReviewCase]
     case_summaries: list[CaseSummary]
     phase_metrics: list[PhaseMetric]
+    cross_summaries: list[CrossSummary]
     findings: list[FindingRecord]
     validation_errors: list[ValidationMessage]
 
@@ -171,6 +194,7 @@ class ReviewDataset:
             "cases": [case.to_dict() for case in self.cases],
             "case_summaries": [summary.to_dict() for summary in self.case_summaries],
             "phase_metrics": [metric.to_dict() for metric in self.phase_metrics],
+            "cross_summaries": [summary.to_dict() for summary in self.cross_summaries],
             "findings": [finding.to_dict() for finding in self.findings],
             "validation_errors": [error.to_dict() for error in self.validation_errors],
         }

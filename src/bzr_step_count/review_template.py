@@ -25,6 +25,7 @@ MANAGEMENT_ROWS = [
     ("Redmine issue", ""),
     ("Redmine URL", ""),
     ("担当者", ""),
+    ("レビュー担当者", ""),
     ("レビュー開始日", ""),
     ("レビュー終了日", ""),
 ]
@@ -82,7 +83,7 @@ def _ensure_finding_columns(sheet: Any, phase: str) -> None:
 
     headers = {_text(sheet.cell(row=header_row, column=column).value): column for column in range(1, sheet.max_column + 1)}
     next_column = sheet.max_column + 1
-    for header in REQUIRED_FINDING_COLUMNS:
+    for header in ["作業担当者", "レビュー担当者", *REQUIRED_FINDING_COLUMNS]:
         if header in headers:
             continue
         sheet.cell(row=header_row, column=next_column).value = header

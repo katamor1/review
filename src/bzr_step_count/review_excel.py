@@ -31,6 +31,7 @@ KEY_ALIASES = {
     "redmine_issue_id": ["Redmine issue", "Redmine Issue", "redmine_issue_id"],
     "redmine_url": ["Redmine URL", "redmine_url"],
     "owner": ["担当者", "owner"],
+    "reviewer": ["レビュー担当者", "レビュア", "reviewer"],
     "review_start": ["レビュー開始日", "review_start"],
     "review_end": ["レビュー終了日", "review_end"],
 }
@@ -126,6 +127,7 @@ def _read_metadata(workbook: Any, path: Path, errors: list[ValidationMessage]) -
         redmine_issue_id=_as_text(_lookup(values, KEY_ALIASES["redmine_issue_id"])),
         redmine_url=_as_text(_lookup(values, KEY_ALIASES["redmine_url"])),
         owner=_as_text(_lookup(values, KEY_ALIASES["owner"])),
+        reviewer=_as_text(_lookup(values, KEY_ALIASES["reviewer"])),
         review_start=_as_text(_lookup(values, KEY_ALIASES["review_start"])),
         review_end=_as_text(_lookup(values, KEY_ALIASES["review_end"])),
     )
@@ -269,9 +271,19 @@ def _read_findings(
                 metric_target=metric_target,
                 detection_phase=_as_text(values.get("検出工程")) or phase,
                 origin_phase=_as_text(values.get("原因工程")) or "不明",
+                work_owner=_first_text(values, ["作業担当者", "対応担当者", "担当者"]) or metadata.owner,
+                reviewer=_first_text(values, ["レビュー担当者", "レビュア"]) or metadata.reviewer,
             )
         )
     return findings
+
+
+def _first_text(values: dict[str, Any], keys: list[str]) -> str:
+    for key in keys:
+        text = _as_text(values.get(key))
+        if text:
+            return text
+    return ""
 
 
 def _find_finding_header(sheet: Any) -> tuple[int | None, dict[str, int]]:

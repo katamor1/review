@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>レビュー統計レポート</title>
+  <style>
+    body { font-family: "Yu Gothic", "Meiryo", sans-serif; margin: 24px; color: #1f2933; }
+    h1, h2 { margin: 0 0 12px; }
+    section { margin: 24px 0; }
+    table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+    th, td { border: 1px solid #d0d7de; padding: 6px 8px; font-size: 13px; }
+    th { background: #f6f8fa; text-align: left; }
+    .kpi { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; }
+    .box { border: 1px solid #d0d7de; border-radius: 6px; padding: 12px; }
+    .value { font-size: 24px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>レビュー統計レポート</h1>
+  <section class="kpi">
+    <div class="box"><div>案件数</div><div class="value">3</div></div>
+    <div class="box"><div>指標対象指摘</div><div class="value">20</div></div>
+    <div class="box"><div>軽微指摘</div><div class="value">5</div></div>
+    <div class="box"><div>流出不良</div><div class="value">3</div></div>
+  </section>
+  <section>
+    <h2>案件別サマリー</h2>
+    <table><thead><tr><th>案件ID</th><th>案件名</th><th>指標対象指摘件数</th><th>軽微指摘件数</th><th>不良指摘件数</th><th>流出不良件数</th><th>流出率</th><th>未対応指摘件数</th></tr></thead><tbody><tr><td>CASE-001</td><td>注文登録機能</td><td>6</td><td>2</td><td>5</td><td>1</td><td>0.2000</td><td>1</td></tr><tr><td>CASE-002</td><td>在庫引当改善</td><td>6</td><td>2</td><td>5</td><td>0</td><td>0.0000</td><td>1</td></tr><tr><td>CASE-003</td><td>帳票CSV出力</td><td>8</td><td>1</td><td>7</td><td>2</td><td>0.2857</td><td>0</td></tr></tbody></table>
+  </section>
+  <section>
+    <h2>工程別指標</h2>
+    <table><thead><tr><th>案件ID</th><th>工程</th><th>指標対象指摘件数</th><th>軽微指摘件数</th><th>除去可能不良件数</th><th>対象工程から流出した不良件数</th><th>指摘密度</th><th>不良除去率</th><th>流出率</th><th>未対応指摘件数</th></tr></thead><tbody><tr><td>CASE-001</td><td>外部仕様書</td><td>1</td><td>1</td><td>2</td><td>1</td><td>0.0556</td><td>0.5000</td><td>0.5000</td><td>0</td></tr><tr><td>CASE-001</td><td>内部仕様書</td><td>2</td><td>0</td><td>3</td><td>1</td><td>0.1667</td><td>0.6667</td><td>0.3333</td><td>1</td></tr><tr><td>CASE-001</td><td>コード</td><td>1</td><td>1</td><td>4</td><td>1</td><td>2.3810</td><td>0.7500</td><td>0.2500</td><td>0</td></tr><tr><td>CASE-001</td><td>テスト仕様書</td><td>1</td><td>0</td><td>5</td><td>1</td><td>0.1111</td><td>0.8000</td><td>0.2000</td><td>0</td></tr><tr><td>CASE-001</td><td>後工程/流出</td><td>1</td><td>0</td><td>5</td><td>1</td><td></td><td>0.8000</td><td>0.2000</td><td>0</td></tr><tr><td>CASE-002</td><td>外部仕様書</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0.0909</td><td>1.0000</td><td>0.0000</td><td>0</td></tr><tr><td>CASE-002</td><td>内部仕様書</td><td>2</td><td>0</td><td>2</td><td>0</td><td>0.1333</td><td>1.0000</td><td>0.0000</td><td>0</td></tr><tr><td>CASE-002</td><td>コード</td><td>2</td><td>1</td><td>4</td><td>0</td><td>2.6316</td><td>1.0000</td><td>0.0000</td><td>1</td></tr><tr><td>CASE-002</td><td>テスト仕様書</td><td>1</td><td>1</td><td>5</td><td>0</td><td>0.0714</td><td>1.0000</td><td>0.0000</td><td>0</td></tr><tr><td>CASE-002</td><td>後工程/流出</td><td>0</td><td>0</td><td>5</td><td>0</td><td></td><td>1.0000</td><td>0.0000</td><td>0</td></tr><tr><td>CASE-003</td><td>外部仕様書</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0.1250</td><td>1.0000</td><td>0.0000</td><td>0</td></tr><tr><td>CASE-003</td><td>内部仕様書</td><td>1</td><td>0</td><td>3</td><td>1</td><td>0.1111</td><td>0.6667</td><td>0.3333</td><td>0</td></tr><tr><td>CASE-003</td><td>コード</td><td>2</td><td>0</td><td>5</td><td>2</td><td>7.1429</td><td>0.6000</td><td>0.4000</td><td>0</td></tr><tr><td>CASE-003</td><td>テスト仕様書</td><td>2</td><td>0</td><td>7</td><td>2</td><td>0.2857</td><td>0.7143</td><td>0.2857</td><td>0</td></tr><tr><td>CASE-003</td><td>後工程/流出</td><td>2</td><td>0</td><td>7</td><td>2</td><td></td><td>0.7143</td><td>0.2857</td><td>0</td></tr></tbody></table>
+  </section>
+  <section>
+    <h2>工程横断サマリー</h2>
+    <table><thead><tr><th>集計値</th><th>指標対象指摘件数</th><th>軽微指摘件数</th><th>不良指摘件数</th><th>流出不良件数</th><th>未対応指摘件数</th></tr></thead><tbody><tr><td>コード</td><td>5</td><td>2</td><td>4</td><td>0</td><td>1</td></tr><tr><td>テスト仕様書</td><td>4</td><td>1</td><td>4</td><td>0</td><td>0</td></tr><tr><td>リリース後</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td></tr><tr><td>内部仕様書</td><td>5</td><td>0</td><td>3</td><td>0</td><td>1</td></tr><tr><td>外部仕様書</td><td>3</td><td>2</td><td>3</td><td>0</td><td>0</td></tr><tr><td>後工程</td><td>2</td><td>0</td><td>2</td><td>2</td><td>0</td></tr></tbody></table>
+  </section>
+  <section>
+    <h2>作業担当者別サマリー</h2>
+    <table><thead><tr><th>集計値</th><th>指標対象指摘件数</th><th>軽微指摘件数</th><th>不良指摘件数</th><th>流出不良件数</th><th>未対応指摘件数</th></tr></thead><tbody><tr><td>品質管理A</td><td>8</td><td>2</td><td>6</td><td>0</td><td>1</td></tr><tr><td>品質管理B</td><td>12</td><td>3</td><td>11</td><td>3</td><td>1</td></tr></tbody></table>
+  </section>
+  <section>
+    <h2>レビュー担当者別サマリー</h2>
+    <table><thead><tr><th>集計値</th><th>指標対象指摘件数</th><th>軽微指摘件数</th><th>不良指摘件数</th><th>流出不良件数</th><th>未対応指摘件数</th></tr></thead><tbody><tr><td>レビューリーダー乙</td><td>10</td><td>2</td><td>7</td><td>0</td><td>2</td></tr><tr><td>レビューリーダー甲</td><td>10</td><td>3</td><td>10</td><td>3</td><td>0</td></tr></tbody></table>
+  </section>
+  <section>
+    <h2>品質警告</h2>
+    <p>該当データはありません。</p>
+  </section>
+</body>
+</html>
