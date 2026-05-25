@@ -6,15 +6,26 @@ from pathlib import Path
 from typing import Any
 
 
-PHASE_ORDER = ["外部仕様書", "内部仕様書", "コード", "テスト仕様書"]
-PHASE_SEQUENCE = ["外部仕様書", "内部仕様書", "コード", "テスト仕様書", "後工程", "リリース後"]
-ESCAPE_PHASE = "後工程/流出"
+PHASE_ORDER = ["外部仕様書", "内部仕様書", "コード", "テスト仕様書", "リリース後"]
+PHASE_SEQUENCE = PHASE_ORDER
+FINAL_PHASE = "リリース後"
+LEGACY_ESCAPE_PHASE = "後工程"
+PHASE_ALIASES = {
+    "後工程": FINAL_PHASE,
+    "後工程/流出": FINAL_PHASE,
+    "流出": FINAL_PHASE,
+}
+ESCAPE_PHASE = FINAL_PHASE
 DOCUMENT_PHASES = ["外部仕様書", "内部仕様書", "テスト仕様書"]
+DOCUMENT_DENSITY_UNIT_PAGES = "pages"
+DOCUMENT_DENSITY_UNIT_CHARACTERS = "characters"
+DOCUMENT_DENSITY_UNITS = {DOCUMENT_DENSITY_UNIT_PAGES, DOCUMENT_DENSITY_UNIT_CHARACTERS}
 PHASE_SHEET_ALIASES = {
     "外部仕様書": ["外部仕様書"],
     "内部仕様書": ["内部仕様書"],
     "コード": ["コード", "コーディング"],
     "テスト仕様書": ["テスト仕様書"],
+    "リリース後": ["リリース後", "後工程", "後工程/流出"],
 }
 
 METRIC_EXCLUDED_CLASSIFICATIONS = {"軽微", "質問", "対象外"}
@@ -45,6 +56,7 @@ class CaseMetadata:
     from_revision: str = ""
     to_revision: str = ""
     code_changed_lines: float = 0
+    bazaar_detected_changed_lines: float | None = None
     escaped_defects: int = 0
     redmine_issue_id: str = ""
     redmine_url: str = ""
@@ -121,6 +133,7 @@ class CaseSummary:
     case_name: str
     workbook_path: str
     total_findings: int
+    display_findings: int
     metric_findings: int
     minor_findings: int
     defect_findings: int
@@ -142,6 +155,7 @@ class PhaseMetric:
     case_name: str
     phase: str
     total_findings: int
+    display_findings: int
     metric_findings: int
     minor_findings: int
     defect_findings: int
@@ -153,6 +167,7 @@ class PhaseMetric:
     denominator_name: str
     denominator_value: float
     finding_density: float | None
+    finding_density_unit: str
     character_density_per_1000: float | None
     defect_removal_rate: float | None
     escape_rate: float | None
@@ -167,6 +182,7 @@ class CrossSummary:
     axis: str
     key: str
     total_findings: int
+    display_findings: int
     metric_findings: int
     minor_findings: int
     defect_findings: int

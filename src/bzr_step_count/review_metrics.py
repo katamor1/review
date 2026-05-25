@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 from .review_models import (
+    DOCUMENT_DENSITY_UNIT_CHARACTERS,
+    DOCUMENT_DENSITY_UNIT_PAGES,
+    DOCUMENT_DENSITY_UNITS,
     DOCUMENT_PHASES,
-    ESCAPE_PHASE,
+    FINAL_PHASE,
     METRIC_EXCLUDED_CLASSIFICATIONS,
+    PHASE_ALIASES,
     PHASE_ORDER,
     PHASE_SEQUENCE,
     CaseSummary,
@@ -20,12 +24,14 @@ def build_review_dataset(
     cases: list[ReviewCase],
     *,
     validation_errors: list[ValidationMessage],
+    document_density_unit: str = DOCUMENT_DENSITY_UNIT_PAGES,
 ) -> ReviewDataset:
+    document_density_unit = _normalize_document_density_unit(document_density_unit)
     all_findings = [finding for case in cases for finding in case.findings]
     summaries = [_build_case_summary(case) for case in cases]
     phase_metrics: list[PhaseMetric] = []
     for case in cases:
-        phase_metrics.extend(_build_phase_metrics(case))
+        phase_metrics.extend(_build_phase_metrics(case, document_density_unit=document_density_unit))
     cross_summaries = _build_cross_summaries(all_findings)
 
     return ReviewDataset(
@@ -50,8 +56,13 @@ def defect_findings(findings: list[FindingRecord]) -> list[FindingRecord]:
     return [finding for finding in metric_findings(findings) if finding.is_defect]
 
 
+def display_findings(findings: list[FindingRecord]) -> list[FindingRecord]:
+    return [finding for finding in findings if not finding.is_minor]
+
+
 def _build_case_summary(case: ReviewCase) -> CaseSummary:
     metadata = case.metadata
+    display = display_findings(case.findings)
     metric = metric_findings(case.findings)
     defects = defect_findings(case.findings)
     minor = [finding for finding in case.findings if finding.is_minor]
@@ -62,6 +73,7 @@ def _build_case_summary(case: ReviewCase) -> CaseSummary:
         case_name=metadata.case_name,
         workbook_path=metadata.workbook_path,
         total_findings=len(case.findings),
+        display_findings=len(display),
         metric_findings=len(metric),
         minor_findings=len(minor),
         defect_findings=len(defects),
@@ -75,14 +87,13 @@ def _build_case_summary(case: ReviewCase) -> CaseSummary:
     )
 
 
-def _build_phase_metrics(case: ReviewCase) -> list[PhaseMetric]:
+def _build_phase_metrics(case: ReviewCase, *, document_density_unit: str) -> list[PhaseMetric]:
     metadata = case.metadata
     defects = defect_findings(case.findings)
-    unknown_escaped = _unknown_escaped_defects(case)
-    total_known_defects = len(defects) + unknown_escaped
     rows: list[PhaseMetric] = []
     for phase in PHASE_ORDER:
         phase_findings = [finding for finding in case.findings if _normalized_phase(finding.detection_phase) == phase]
+        phase_display = display_findings(phase_findings)
         phase_metric = metric_findings(phase_findings)
         phase_defects = defect_findings(phase_findings)
         eligible_defects = [finding for finding in defects if _phase_lte(finding.origin_phase, phase)]
@@ -92,13 +103,19 @@ def _build_phase_metrics(case: ReviewCase) -> list[PhaseMetric]:
         escaped_from_phase_defects = [
             finding for finding in eligible_defects if _phase_gt(finding.detection_phase, phase)
         ]
-        denominator_name, denominator_value, density = _density_for_phase(case, phase, len(phase_metric))
+        denominator_name, denominator_value, density, density_unit = _density_for_phase(
+            case,
+            phase,
+            len(phase_metric),
+            document_density_unit=document_density_unit,
+        )
         rows.append(
             PhaseMetric(
                 case_id=metadata.case_id,
                 case_name=metadata.case_name,
                 phase=phase,
                 total_findings=len(phase_findings),
+                display_findings=len(phase_display),
                 metric_findings=len(phase_metric),
                 minor_findings=sum(1 for finding in phase_findings if finding.is_minor),
                 defect_findings=len(phase_defects),
@@ -110,52 +127,18 @@ def _build_phase_metrics(case: ReviewCase) -> list[PhaseMetric]:
                 denominator_name=denominator_name,
                 denominator_value=denominator_value,
                 finding_density=density,
+                finding_density_unit=density_unit,
                 character_density_per_1000=_character_density(case, phase, len(phase_metric)),
                 defect_removal_rate=_safe_rate(len(removed_eligible_defects), len(eligible_defects)),
                 escape_rate=_safe_rate(len(escaped_from_phase_defects), len(eligible_defects)),
                 open_findings=sum(1 for finding in phase_findings if finding.is_open),
             )
         )
-
-    escaped_phase_findings = [
-        finding
-        for finding in case.findings
-        if _normalized_phase(finding.detection_phase) in {"後工程", "リリース後"}
-    ]
-    removed_before_escape = [
-        finding for finding in defects if _phase_lte(finding.detection_phase, "テスト仕様書")
-    ]
-    known_escaped = len([finding for finding in defects if _phase_gt(finding.detection_phase, "テスト仕様書")])
-    rows.append(
-        PhaseMetric(
-            case_id=metadata.case_id,
-            case_name=metadata.case_name,
-            phase=ESCAPE_PHASE,
-            total_findings=len(escaped_phase_findings) + unknown_escaped,
-            metric_findings=len(metric_findings(escaped_phase_findings)) + unknown_escaped,
-            minor_findings=0,
-            defect_findings=known_escaped + unknown_escaped,
-            cumulative_defects=len(removed_before_escape),
-            escaped_defects=metadata.escaped_defects,
-            eligible_defects=total_known_defects,
-            removed_eligible_defects=len(removed_before_escape),
-            escaped_from_phase_defects=metadata.escaped_defects,
-            denominator_name="最終把握不良件数",
-            denominator_value=total_known_defects,
-            finding_density=None,
-            character_density_per_1000=None,
-            defect_removal_rate=_safe_rate(len(removed_before_escape), total_known_defects),
-            escape_rate=_safe_rate(metadata.escaped_defects, total_known_defects),
-            open_findings=0,
-        )
-    )
     return rows
 
 
 def _unknown_escaped_defects(case: ReviewCase) -> int:
-    known_escaped = sum(
-        1 for finding in defect_findings(case.findings) if _phase_gt(finding.detection_phase, "テスト仕様書")
-    )
+    known_escaped = sum(1 for finding in defect_findings(case.findings) if _is_escape_detection(finding))
     return max(case.metadata.escaped_defects - known_escaped, 0)
 
 
@@ -178,25 +161,37 @@ def _summarize_axis(axis: str, findings: list[FindingRecord], key_fn) -> list[Cr
             axis=axis,
             key=key,
             total_findings=len(group),
+            display_findings=len(display_findings(group)),
             metric_findings=len(metric_findings(group)),
             minor_findings=sum(1 for finding in group if finding.is_minor),
             defect_findings=len(defect_findings(group)),
-            escaped_defects=sum(1 for finding in defect_findings(group) if _phase_gt(finding.detection_phase, "テスト仕様書")),
+            escaped_defects=sum(1 for finding in defect_findings(group) if _is_escape_detection(finding)),
             open_findings=sum(1 for finding in group if finding.is_open),
         )
         for key, group in sorted(grouped.items())
     ]
 
 
-def _density_for_phase(case: ReviewCase, phase: str, metric_count: int) -> tuple[str, float, float | None]:
+def _density_for_phase(
+    case: ReviewCase,
+    phase: str,
+    metric_count: int,
+    *,
+    document_density_unit: str,
+) -> tuple[str, float, float | None, str]:
     if phase == "コード":
         denominator = case.metadata.code_changed_lines
-        return "変更ステップ数(KLOC換算)", denominator, _safe_rate(metric_count * 1000, denominator)
+        return "変更ステップ数(KLOC換算)", denominator, _safe_rate(metric_count * 1000, denominator), "件/KLOC"
+
+    if phase in DOCUMENT_PHASES:
+        if document_density_unit == DOCUMENT_DENSITY_UNIT_CHARACTERS:
+            denominator = case.metadata.phase_characters.get(phase, 0)
+            return "レビュー対象文字数", denominator, _safe_rate(metric_count * 1000, denominator), "件/1000文字"
+        denominator = case.metadata.phase_pages.get(phase, 0)
+        return "レビュー対象ページ数", denominator, _safe_rate(metric_count, denominator), "件/ページ"
 
     denominator = case.metadata.phase_pages.get(phase, 0)
-    if phase in DOCUMENT_PHASES:
-        return "レビュー対象ページ数", denominator, _safe_rate(metric_count, denominator)
-    return "対象数", denominator, _safe_rate(metric_count, denominator)
+    return "対象数", denominator, _safe_rate(metric_count, denominator), "件/対象"
 
 
 def _character_density(case: ReviewCase, phase: str, metric_count: int) -> float | None:
@@ -212,11 +207,22 @@ def _safe_rate(numerator: float, denominator: float) -> float | None:
     return numerator / denominator
 
 
+def _normalize_document_density_unit(value: str) -> str:
+    unit = (value or DOCUMENT_DENSITY_UNIT_PAGES).strip().lower()
+    if unit not in DOCUMENT_DENSITY_UNITS:
+        raise ValueError("仕様書の指摘密度単位は pages または characters を指定してください")
+    return unit
+
+
 def _normalized_phase(phase: str) -> str:
     text = (phase or "").strip()
-    if text in {"後工程/流出", "流出"}:
-        return "後工程"
+    if text in PHASE_ALIASES:
+        return PHASE_ALIASES[text]
     return text or "不明"
+
+
+def _is_escape_detection(finding: FindingRecord) -> bool:
+    return _normalized_phase(finding.detection_phase) == FINAL_PHASE
 
 
 def _phase_lte(left: str, right: str) -> bool:

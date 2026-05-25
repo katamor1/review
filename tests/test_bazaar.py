@@ -26,6 +26,36 @@ def test_fetch_bazaar_diff_invokes_bzr_with_argument_array(monkeypatch, tmp_path
     assert calls[0][1]["timeout"] == 5
 
 
+def test_fetch_bazaar_diff_normalizes_display_revision_labels(monkeypatch, tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        return subprocess.CompletedProcess(args, 0, stdout="diff text", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    fetch_bazaar_diff(repo, "r1999", "r2001")
+
+    assert calls[0] == ["bzr", "diff", "-r", "1999..2001"]
+
+
+def test_fetch_bazaar_diff_accepts_diff_exit_code_when_stdout_has_diff(monkeypatch, tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    def fake_run(args, **kwargs):
+        return subprocess.CompletedProcess(args, 1, stdout="=== modified file 'a.txt'\n", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    result = fetch_bazaar_diff(repo, "1999", "2001")
+
+    assert result.stdout == "=== modified file 'a.txt'\n"
+
+
 def test_fetch_bazaar_diff_rejects_missing_repo(tmp_path):
     with pytest.raises(BazaarError) as exc:
         fetch_bazaar_diff(tmp_path / "missing", "1", "2")

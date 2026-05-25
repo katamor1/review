@@ -29,6 +29,49 @@ def test_parser_counts_hunk_changes_without_counting_headers():
     assert change.hunk_count == 1
 
 
+def test_parser_ignores_revision_management_hunk_lines():
+    diff = """=== modified file 'src/revision-info.txt'
+--- src/revision-info.txt
++++ src/revision-info.txt
+@@ -1,4 +1,4 @@
+ kind=side
+-main_revno=1999
+-side_revision=3998
++main_revno=2000
++side_revision=4000
+-real_deleted_line()
++real_added_line()
+"""
+
+    result = parse_unified_diff(diff)
+
+    change = result.files[0]
+    assert change.path == "src/revision-info.txt"
+    assert change.added_lines == 1
+    assert change.deleted_lines == 1
+    assert change.total_changed_lines == 2
+
+
+def test_parser_marks_history_marker_as_revision_management_metadata():
+    diff = """=== modified file 'meta/history-marker.txt'
+--- meta/history-marker.txt
++++ meta/history-marker.txt
+@@ -1,3 +1,4 @@
+ kind=side
+-main_revno=1999
++main_revno=2000
++This fixed-size marker is rewritten by synthetic history commits.
+"""
+
+    result = parse_unified_diff(diff)
+
+    change = result.files[0]
+    assert change.path == "meta/history-marker.txt"
+    assert change.added_lines == 0
+    assert change.deleted_lines == 0
+    assert change.ignored_reason == "revision management metadata"
+
+
 def test_parser_handles_added_removed_multiple_hunks_empty_lines_and_no_newline_marker():
     diff = """=== added file 'src/new.py'
 --- /dev/null

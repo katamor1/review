@@ -14,7 +14,8 @@ DISPLAY_LABELS = {
     "case_id": "案件ID",
     "case_name": "案件名",
     "workbook_path": "レビュー結果記録表",
-    "total_findings": "指摘件数",
+    "total_findings": "全指摘件数",
+    "display_findings": "表示対象指摘件数",
     "metric_findings": "指標対象指摘件数",
     "minor_findings": "軽微指摘件数",
     "defect_findings": "不良指摘件数",
@@ -33,6 +34,7 @@ DISPLAY_LABELS = {
     "denominator_name": "密度分母",
     "denominator_value": "分母値",
     "finding_density": "指摘密度",
+    "finding_density_unit": "指摘密度単位",
     "character_density_per_1000": "1000文字あたり指摘密度",
     "defect_removal_rate": "不良除去率",
     "severity": "重大度",
@@ -184,8 +186,8 @@ def _write_html_from_dicts(
     errors: list[dict[str, Any]],
 ) -> None:
     total_cases = len(summaries)
+    total_display = sum(int(row.get("display_findings") or 0) for row in summaries)
     total_metric = sum(int(row.get("metric_findings") or 0) for row in summaries)
-    total_minor = sum(int(row.get("minor_findings") or 0) for row in summaries)
     total_escaped = sum(int(row.get("escaped_defects") or 0) for row in summaries)
     body = f"""<!doctype html>
 <html lang="ja">
@@ -208,29 +210,29 @@ def _write_html_from_dicts(
   <h1>レビュー統計レポート</h1>
   <section class="kpi">
     <div class="box"><div>案件数</div><div class="value">{total_cases}</div></div>
+    <div class="box"><div>表示対象指摘</div><div class="value">{total_display}</div></div>
     <div class="box"><div>指標対象指摘</div><div class="value">{total_metric}</div></div>
-    <div class="box"><div>軽微指摘</div><div class="value">{total_minor}</div></div>
     <div class="box"><div>流出不良</div><div class="value">{total_escaped}</div></div>
   </section>
   <section>
     <h2>案件別サマリー</h2>
-    {_html_table(summaries, ["case_id", "case_name", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "escape_rate", "open_findings"])}
+    {_html_table(summaries, ["case_id", "case_name", "display_findings", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "escape_rate", "open_findings"])}
   </section>
   <section>
     <h2>工程別指標</h2>
-    {_html_table(metrics, ["case_id", "phase", "metric_findings", "minor_findings", "eligible_defects", "escaped_from_phase_defects", "finding_density", "defect_removal_rate", "escape_rate", "open_findings"])}
+    {_html_table(metrics, ["case_id", "phase", "display_findings", "metric_findings", "minor_findings", "eligible_defects", "escaped_from_phase_defects", "finding_density", "finding_density_unit", "defect_removal_rate", "escape_rate", "open_findings"])}
   </section>
   <section>
     <h2>工程横断サマリー</h2>
-    {_html_table(_filter_dict_summaries(cross_summaries, "工程"), ["key", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "open_findings"])}
+    {_html_table(_filter_dict_summaries(cross_summaries, "工程"), ["key", "display_findings", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "open_findings"])}
   </section>
   <section>
     <h2>作業担当者別サマリー</h2>
-    {_html_table(_filter_dict_summaries(cross_summaries, "作業担当者"), ["key", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "open_findings"])}
+    {_html_table(_filter_dict_summaries(cross_summaries, "作業担当者"), ["key", "display_findings", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "open_findings"])}
   </section>
   <section>
     <h2>レビュー担当者別サマリー</h2>
-    {_html_table(_filter_dict_summaries(cross_summaries, "レビュー担当者"), ["key", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "open_findings"])}
+    {_html_table(_filter_dict_summaries(cross_summaries, "レビュー担当者"), ["key", "display_findings", "metric_findings", "minor_findings", "defect_findings", "escaped_defects", "open_findings"])}
   </section>
   <section>
     <h2>品質警告</h2>

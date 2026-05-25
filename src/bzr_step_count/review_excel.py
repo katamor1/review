@@ -7,6 +7,7 @@ from typing import Any
 from openpyxl import load_workbook
 
 from .review_models import (
+    FINAL_PHASE,
     METRIC_EXCLUDED_CLASSIFICATIONS,
     PHASE_ORDER,
     PHASE_SHEET_ALIASES,
@@ -60,6 +61,17 @@ def read_review_workbook(path: str | Path) -> ReviewCase:
     for phase in PHASE_ORDER:
         sheet = _find_phase_sheet(workbook, phase)
         if sheet is None:
+            if phase == FINAL_PHASE:
+                errors.append(
+                    ValidationMessage(
+                        "warning",
+                        "missing_optional_phase_sheet",
+                        f"任意工程シートが見つかりません: {phase}",
+                        path=str(workbook_path),
+                        case_id=metadata.case_id,
+                    )
+                )
+                continue
             errors.append(
                 ValidationMessage(
                     "error",
@@ -72,6 +84,7 @@ def read_review_workbook(path: str | Path) -> ReviewCase:
             continue
         findings.extend(_read_findings(sheet, phase, metadata, errors))
 
+    metadata.escaped_defects = _count_release_after_defects(findings)
     return ReviewCase(metadata=metadata, findings=findings, validation_errors=errors)
 
 
@@ -239,7 +252,7 @@ def _read_findings(
                     case_id=metadata.case_id,
                 )
             )
-        if "指標対象" in header_map and not target_text:
+        if "指標対象" in header_map and not target_text and classification != "軽微":
             errors.append(
                 ValidationMessage(
                     "warning",
@@ -276,6 +289,10 @@ def _read_findings(
             )
         )
     return findings
+
+
+def _count_release_after_defects(findings: list[FindingRecord]) -> int:
+    return sum(1 for finding in findings if finding.phase == FINAL_PHASE and finding.is_defect)
 
 
 def _first_text(values: dict[str, Any], keys: list[str]) -> str:

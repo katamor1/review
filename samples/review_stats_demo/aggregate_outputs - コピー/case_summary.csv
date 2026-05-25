@@ -1,0 +1,4 @@
+﻿案件ID,案件名,レビュー結果記録表,全指摘件数,表示対象指摘件数,指標対象指摘件数,軽微指摘件数,不良指摘件数,流出不良件数,流出率,未対応指摘件数,コード変更ステップ数,外部仕様書ページ数,内部仕様書ページ数,テスト仕様書ページ数
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,8,6,6,2,5,1,0.2,1,420.0,18.0,12.0,9.0
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,8,6,6,2,5,0,0.0,1,760.0,11.0,15.0,14.0
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,9,8,8,1,7,2,0.2857142857142857,0,280.0,8.0,9.0,7.0

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
 import subprocess
 
 
@@ -32,7 +33,9 @@ def fetch_bazaar_diff(
     if not repo.exists() or not repo.is_dir():
         raise BazaarError("repo_not_found", f"Repository path does not exist or is not a directory: {repo}")
 
-    args = ["bzr", "diff", "-r", f"{from_revision}..{to_revision}"]
+    from_spec = _normalize_revision_spec(from_revision)
+    to_spec = _normalize_revision_spec(to_revision)
+    args = ["bzr", "diff", "-r", f"{from_spec}..{to_spec}"]
     args.extend(paths or [])
 
     try:
@@ -53,8 +56,20 @@ def fetch_bazaar_diff(
     except OSError as exc:
         raise BazaarError("execution_error", str(exc)) from exc
 
-    if completed.returncode != 0:
+    if completed.returncode != 0 and not _has_diff_stdout(completed.stdout):
         message = completed.stderr.strip() or f"bzr diff failed with exit code {completed.returncode}"
         raise BazaarError("bzr_error", message, stderr=completed.stderr, returncode=completed.returncode)
 
     return DiffCommandResult(stdout=completed.stdout, stderr=completed.stderr, args=args)
+
+
+def _normalize_revision_spec(revision: str) -> str:
+    value = str(revision).strip()
+    match = re.fullmatch(r"[rR](\d+)", value)
+    if match:
+        return match.group(1)
+    return value
+
+
+def _has_diff_stdout(stdout: str) -> bool:
+    return bool(stdout and stdout.strip())

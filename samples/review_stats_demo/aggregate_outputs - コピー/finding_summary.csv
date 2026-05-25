@@ -1,0 +1,26 @@
+﻿案件ID,案件名,レビュー結果記録表,工程,シート,行,No,重大度,指摘箇所,指摘内容,対応日時,状況,備考,指摘分類,指標対象,検出工程,原因工程,作業担当者,レビュー担当者
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,外部仕様書,外部仕様書,13,1,A,1.2 業務ルール,取消時の在庫戻し条件が未記載,2026-05-15,対応済,,不良,true,外部仕様書,外部仕様書,品質管理A,レビューリーダー甲
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,外部仕様書,外部仕様書,14,2,D,表紙,版数表記の揺れ,2026-05-15,対応済,,軽微,false,外部仕様書,外部仕様書,品質管理A,レビューリーダー甲
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,内部仕様書,内部仕様書,13,1,B,DB更新仕様,重複登録時のロールバック条件が曖昧,2026-05-15,対応済,,不良,true,内部仕様書,内部仕様書,品質管理A,レビューリーダー乙
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,内部仕様書,内部仕様書,14,2,C,画面遷移,説明文を補足した方がよい,,対応保留,,改善,true,内部仕様書,内部仕様書,品質管理A,レビューリーダー乙
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,コード,コード,13,1,B,src/order_service.py,数量0の境界値チェックが不足,2026-05-15,対応済,,不良,true,コード,コード,品質管理B,レビューリーダー乙
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,コード,コード,14,2,D,src/order_service.py,コメント内の誤字,2026-05-15,対応済,,軽微,false,コード,コード,品質管理B,レビューリーダー乙
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,テスト仕様書,テスト仕様書,13,1,C,異常系ケース,取消済み注文の再取消ケースが不足,2026-05-15,対応済,,不良,true,テスト仕様書,テスト仕様書,品質管理B,レビューリーダー甲
+CASE-001,注文登録機能,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-001\レビュー結果記録表.xlsx,リリース後,リリース後,13,1,B,結合試験,取消後の通知抑止条件が漏れていた,2026-05-15,対応済,,不良,true,後工程,外部仕様書,品質管理B,レビューリーダー乙
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,外部仕様書,外部仕様書,13,1,B,2.1 引当優先順位,同一優先度時の並び順が未定義,2026-05-15,対応済,,不良,true,外部仕様書,外部仕様書,品質管理A,レビューリーダー甲
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,内部仕様書,内部仕様書,13,1,A,排他制御,同時更新時の再試行条件が不足,2026-05-15,対応済,,不良,true,内部仕様書,内部仕様書,品質管理A,レビューリーダー乙
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,内部仕様書,内部仕様書,14,2,C,ログ仕様,運用調査用ログ項目の追加提案,2026-05-15,対応済,,改善,true,内部仕様書,内部仕様書,品質管理A,レビューリーダー乙
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,コード,コード,13,1,B,src/stock_allocator.cpp,ロック解放漏れの可能性,2026-05-15,対応済,,不良,true,コード,コード,品質管理B,レビューリーダー乙
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,コード,コード,14,2,C,src/stock_allocator.cpp,インデントずれ,2026-05-15,対応済,,軽微,false,コード,コード,品質管理B,レビューリーダー乙
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,コード,コード,15,3,C,src/stock_allocator.cpp,戻り値名が仕様と不一致,,対応保留,,不良,true,コード,コード,品質管理B,レビューリーダー乙
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,テスト仕様書,テスト仕様書,13,1,B,負荷試験,同時引当の競合ケースが不足,2026-05-15,対応済,,不良,true,テスト仕様書,テスト仕様書,品質管理B,レビューリーダー甲
+CASE-002,在庫引当改善,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-002\レビュー結果記録表.xlsx,テスト仕様書,テスト仕様書,14,2,D,表記,表の罫線崩れ,2026-05-15,対応不要,,軽微,false,テスト仕様書,テスト仕様書,品質管理B,レビューリーダー甲
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,外部仕様書,外部仕様書,13,1,C,出力項目,NULL時の空欄/0出力ルールが曖昧,2026-05-15,対応済,,不良,true,外部仕様書,外部仕様書,品質管理A,レビューリーダー甲
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,外部仕様書,外部仕様書,14,2,D,本文,句読点の揺れ,2026-05-15,対応済,,軽微,false,外部仕様書,外部仕様書,品質管理A,レビューリーダー甲
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,内部仕様書,内部仕様書,13,1,B,文字コード,Shift_JIS変換失敗時の扱いが未記載,2026-05-15,対応済,,不良,true,内部仕様書,内部仕様書,品質管理A,レビューリーダー乙
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,コード,コード,13,1,A,src/csv_exporter.cs,改行を含む項目のクォート処理が不足,2026-05-15,対応済,,不良,true,コード,コード,品質管理B,レビューリーダー乙
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,コード,コード,14,2,C,src/csv_exporter.cs,例外メッセージが利用者向けでない,2026-05-15,対応済,,改善,true,コード,コード,品質管理B,レビューリーダー乙
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,テスト仕様書,テスト仕様書,13,1,B,境界値,最大桁数の出力確認が不足,2026-05-15,対応済,,不良,true,テスト仕様書,テスト仕様書,品質管理B,レビューリーダー甲
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,テスト仕様書,テスト仕様書,14,2,C,観点,空ファイル出力時の期待値を追記,2026-05-15,対応済,,不良,true,テスト仕様書,テスト仕様書,品質管理B,レビューリーダー甲
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,リリース後,リリース後,13,1,A,リリース後障害,改行を含むCSVが取込先で分割された,2026-05-15,対応済,,不良,true,リリース後,コード,品質管理B,レビューリーダー乙
+CASE-003,帳票CSV出力,C:\Users\stell\source\repos\review\samples\review_stats_demo\review_cases\CASE-003\レビュー結果記録表.xlsx,リリース後,リリース後,14,2,B,後工程試験,文字コード変換エラーの再実行手順が不足,2026-05-15,対応済,,不良,true,後工程,内部仕様書,品質管理B,レビューリーダー乙

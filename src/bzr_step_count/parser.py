@@ -4,6 +4,11 @@ from dataclasses import dataclass, field
 import re
 
 from .models import FileChange, normalize_path
+from .revision_metadata import (
+    REVISION_MANAGEMENT_IGNORED_REASON,
+    is_revision_management_line,
+    is_revision_management_path,
+)
 
 
 @dataclass
@@ -17,8 +22,6 @@ _META_RE = re.compile(
     r"^===\s+(?P<status>added|modified|removed|renamed|kind changed)\s+file\s+'(?P<path>[^']+)'"
     r"(?:\s+=>\s+'(?P<new>[^']+)')?"
 )
-
-
 def parse_unified_diff(diff_text: str) -> ParseResult:
     result = ParseResult()
     current: FileChange | None = None
@@ -28,6 +31,10 @@ def parse_unified_diff(diff_text: str) -> ParseResult:
         nonlocal current
         if current is not None:
             current.__post_init__()
+            if is_revision_management_path(current.path):
+                current.added_lines = 0
+                current.deleted_lines = 0
+                current.ignored_reason = current.ignored_reason or REVISION_MANAGEMENT_IGNORED_REASON
             result.files.append(current)
             current = None
 
@@ -79,9 +86,13 @@ def parse_unified_diff(diff_text: str) -> ParseResult:
             if line.startswith("\\ No newline"):
                 continue
             if line.startswith("+"):
+                if is_revision_management_line(line[1:]):
+                    continue
                 current.added_lines += 1
                 continue
             if line.startswith("-"):
+                if is_revision_management_line(line[1:]):
+                    continue
                 current.deleted_lines += 1
                 continue
 
@@ -121,3 +132,4 @@ def _parse_file_header_path(header_value: str) -> str | None:
 def _looks_binary_line(line: str) -> bool:
     lower = line.lower()
     return lower.startswith("binary files ") or lower.startswith("cannot display:")
+

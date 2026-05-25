@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import sys
 
+from .review_models import DOCUMENT_DENSITY_UNIT_CHARACTERS, DOCUMENT_DENSITY_UNIT_PAGES
 from .review_outputs import regenerate_reports_from_sqlite
 from .review_scan import scan_review_root, validate_review_root
 from .review_template import upgrade_review_workbook_template
@@ -14,12 +15,22 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "validate":
-            dataset = validate_review_root(args.root, args.output, write_outputs=bool(args.output))
+            dataset = validate_review_root(
+                args.root,
+                args.output,
+                document_density_unit=args.document_density_unit,
+                write_outputs=bool(args.output),
+            )
             _print_validation_summary(dataset)
             return 1 if any(error.severity == "error" for error in dataset.validation_errors) else 0
 
         if args.command == "scan":
-            dataset = scan_review_root(args.root, args.output, skip_bazaar=args.skip_bazaar)
+            dataset = scan_review_root(
+                args.root,
+                args.output,
+                skip_bazaar=args.skip_bazaar,
+                document_density_unit=args.document_density_unit,
+            )
             _print_scan_summary(dataset, args.output)
             return 0
 
@@ -47,11 +58,23 @@ def build_arg_parser() -> argparse.ArgumentParser:
     validate = subparsers.add_parser("validate", help="Validate review workbook format under a root")
     validate.add_argument("--root", required=True, help="Case root folder or one workbook path")
     validate.add_argument("--output", help="Optional output directory for validation CSV/HTML/SQLite")
+    validate.add_argument(
+        "--document-density-unit",
+        choices=[DOCUMENT_DENSITY_UNIT_PAGES, DOCUMENT_DENSITY_UNIT_CHARACTERS],
+        default=DOCUMENT_DENSITY_UNIT_PAGES,
+        help="Document review density denominator: pages or characters",
+    )
 
     scan = subparsers.add_parser("scan", help="Scan review workbooks and write metrics")
     scan.add_argument("--root", required=True, help="Case root folder or one workbook path")
     scan.add_argument("--output", required=True, help="Output directory")
     scan.add_argument("--skip-bazaar", action="store_true", help="Do not invoke bzr diff; use Excel code steps only")
+    scan.add_argument(
+        "--document-density-unit",
+        choices=[DOCUMENT_DENSITY_UNIT_PAGES, DOCUMENT_DENSITY_UNIT_CHARACTERS],
+        default=DOCUMENT_DENSITY_UNIT_PAGES,
+        help="Document review density denominator: pages or characters",
+    )
 
     report = subparsers.add_parser("report", help="Regenerate CSV/HTML reports from review_stats.sqlite")
     report.add_argument("--database", required=True, help="Path to review_stats.sqlite")
