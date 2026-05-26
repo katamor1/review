@@ -20,10 +20,26 @@ def test_fetch_bazaar_diff_invokes_bzr_with_argument_array(monkeypatch, tmp_path
     result = fetch_bazaar_diff(repo, "1000", "1100", paths=["src"], timeout=5)
 
     assert result.stdout == "diff text"
-    assert calls[0][0] == ["bzr", "diff", "-r", "1000..1100", "src"]
+    assert calls[0][0] == ["bzr", "--no-aliases", "diff", "-r", "1000..1100", "src"]
     assert calls[0][1]["cwd"] == str(repo)
     assert calls[0][1]["shell"] is False
     assert calls[0][1]["timeout"] == 5
+
+
+def test_fetch_bazaar_diff_ignores_user_command_aliases(monkeypatch, tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        return subprocess.CompletedProcess(args, 0, stdout="diff text", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    fetch_bazaar_diff(repo, "1000", "1100")
+
+    assert calls[0][:3] == ["bzr", "--no-aliases", "diff"]
 
 
 def test_fetch_bazaar_diff_normalizes_display_revision_labels(monkeypatch, tmp_path):
@@ -39,7 +55,7 @@ def test_fetch_bazaar_diff_normalizes_display_revision_labels(monkeypatch, tmp_p
 
     fetch_bazaar_diff(repo, "r1999", "r2001")
 
-    assert calls[0] == ["bzr", "diff", "-r", "1999..2001"]
+    assert calls[0] == ["bzr", "--no-aliases", "diff", "-r", "1999..2001"]
 
 
 def test_fetch_bazaar_diff_accepts_diff_exit_code_when_stdout_has_diff(monkeypatch, tmp_path):

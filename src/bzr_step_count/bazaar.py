@@ -35,7 +35,7 @@ def fetch_bazaar_diff(
 
     from_spec = _normalize_revision_spec(from_revision)
     to_spec = _normalize_revision_spec(to_revision)
-    args = ["bzr", "diff", "-r", f"{from_spec}..{to_spec}"]
+    args = ["bzr", "--no-aliases", "diff", "-r", f"{from_spec}..{to_spec}"]
     args.extend(paths or [])
 
     try:

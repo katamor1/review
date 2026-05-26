@@ -2,6 +2,9 @@
 
 `bzr-step-count` counts physical raw-diff step changes between two Bazaar
 revisions by parsing `bzr diff -r FROM..TO` unified diff output.
+It invokes Bazaar with `--no-aliases` so GUI-oriented `diff` aliases, such as
+WinMerge launchers used by Bazaar Explorer/QBzr, do not replace the unified diff
+text needed for line counting.
 
 ```powershell
 py -m pip install -e .
