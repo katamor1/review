@@ -34,6 +34,44 @@ review-stats upgrade-template --source samples\レビュー結果記録表.xlsx 
 review-stats-gui
 ```
 
+## Windows single-file release
+
+`scripts\build_release.ps1` runs the tests and packages the Python interpreter,
+this project, and its Python dependencies into one file:
+`dist\review-stats.exe`.
+
+```powershell
+.\scripts\build_release.ps1
+```
+
+Only `review-stats.exe` needs to be distributed. The same executable provides
+the GUI and both existing command-line tools:
+
+```powershell
+# Double-click, or launch the GUI explicitly.
+.\dist\review-stats.exe
+.\dist\review-stats.exe gui
+
+# Existing review-stats commands.
+.\dist\review-stats.exe scan --root C:\share\案件ルート --output C:\review-stats\monthly
+.\dist\review-stats.exe validate --root C:\share\案件ルート
+.\dist\review-stats.exe report --database C:\review-stats\monthly\review_stats.sqlite --output C:\review-stats\monthly-report
+
+# Existing bzr-step-count command, selected with the count prefix.
+.\dist\review-stats.exe count --repo C:\path\to\repo --from 1000 --to 1100
+```
+
+The bundled executable does not include external applications. Bazaar
+`bzr.exe` must still be available on `PATH` when Bazaar revision comparison is
+used. LibreOffice `soffice.exe` remains optional for rendered Word page counts;
+the existing estimated page-count fallback is used when it is unavailable.
+PyInstaller one-file mode extracts its internal runtime into a temporary
+folder while the program is running, but no sidecar files need to be shipped.
+
+The GitHub Actions workflow builds the same single executable on pull requests
+and manual runs. Tags matching `v*` also create or update a GitHub Release with
+only `review-stats.exe` attached.
+
 If the Python Scripts directory is not on `PATH`, use the module entrypoint:
 
 ```powershell
