@@ -11,6 +11,10 @@ requires-python = ">=3.11"
 authors = [{ name = "Codex" }]
 dependencies = ["openpyxl>=3.1", "python-docx>=1.1", "pypdf>=4"]
 
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+release = ["pyinstaller>=6.21,<7"]
+
 [project.scripts]
 bzr-step-count = "bzr_step_count.cli:main"
 review-stats = "bzr_step_count.review_cli:main"
